@@ -8,6 +8,8 @@ Create a `.env.local` file with following variables:
 COGNITO_CLIENT_ID=
 COGNITO_CLIENT_SECRET=
 COGNITO_ISSUER=
+NEXTAUTH_URL=
+COGNITO_DOMAIN=
 ```
 
 Run the development server:

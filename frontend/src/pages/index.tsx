@@ -1,4 +1,5 @@
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
+
 export default function Home() {
   const { data: session, status: loading } = useSession();
 
@@ -6,7 +7,11 @@ export default function Home() {
     return (
       <div>
         Signed in as {session.user?.email || session.user?.name} <br />
-        <button onClick={() => signOut()}>Sign out</button>
+        <button
+          onClick={() => (window.location.href = '/api/auth/logout')}
+        >
+          Sign out
+        </button>
       </div>
     );
   }
