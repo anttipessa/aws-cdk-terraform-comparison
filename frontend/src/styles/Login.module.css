@@ -1,0 +1,17 @@
+/* style the button and center it */
+
+.btn {
+  background-color: #4c5baf;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+}
