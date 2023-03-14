@@ -41,27 +41,6 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
     compress               = true
   }
 
-  ordered_cache_behavior {
-    path_pattern     = "/index.html"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = local.s3_origin_id
-
-    forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
-    }
-
-    min_ttl                = 0
-    default_ttl            = 0
-    max_ttl                = 0
-    compress               = true
-    viewer_protocol_policy = "redirect-to-https"
-  }
-
   price_class = "PriceClass_100"
 
   viewer_certificate {
@@ -82,4 +61,9 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
     response_page_path    = "/index.html"
   }
 
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
 }
