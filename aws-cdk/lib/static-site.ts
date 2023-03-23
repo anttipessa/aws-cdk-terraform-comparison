@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
-import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as cloudfront_origins from "aws-cdk-lib/aws-cloudfront-origins";
 import { CfnOutput, Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { CachePolicy } from "aws-cdk-lib/aws-cloudfront";
+import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 
 /**
  * Static site infrastructure, which deploys site content to an S3 bucket.
@@ -102,8 +102,8 @@ export class StaticSite extends Construct {
       value: distribution.distributionDomainName,
     });
 
-    new s3deploy.BucketDeployment(this, "DeployWithInvalidation", {
-      sources: [s3deploy.Source.asset("../react-app/build")],
+    new BucketDeployment(this, "DeployWithInvalidation", {
+      sources: [Source.asset("../react-app/build")],
       destinationBucket: siteBucket,
       distribution,
       distributionPaths: ["/*"],
