@@ -1,8 +1,8 @@
 
 data "archive_file" "lambda" {
   type        = "zip"
-  source_dir  = "../lambda/build"
-  output_path = "../lambda/dist/lambda.zip"
+  source_dir  = "../${path.root}/lambda/dist"
+  output_path = "../${path.root}/lambda/dist/lambda.zip"
 }
 
 resource "aws_lambda_function" "read_function" {
@@ -12,6 +12,7 @@ resource "aws_lambda_function" "read_function" {
   handler       = "readFunction.handler"
   architectures = ["arm64"]
   runtime       = "nodejs14.x"
+  source_code_hash = data.archive_file.lambda.output_base64sha256
 }
 
 resource "aws_lambda_function" "write_function" {
@@ -21,6 +22,7 @@ resource "aws_lambda_function" "write_function" {
   handler       = "writeFunction.handler"
   architectures = ["arm64"]
   runtime       = "nodejs14.x"
+  source_code_hash = data.archive_file.lambda.output_base64sha256
 }
 
 resource "aws_lambda_permission" "allow_api_gateway_read" {

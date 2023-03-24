@@ -1,8 +1,6 @@
 resource "aws_s3_bucket" "static_react_bucket" {
-  bucket = "react-bucket-hosted-aws-s3-terraform"
-  tags = {
-    Name = "react-bucket"
-  }
+  bucket = var.bucket_name
+  tags = var.tags
   force_destroy = true
 }
 

@@ -73,6 +73,3 @@ resource "aws_cloudwatch_log_group" "api_gateway_sample" {
   retention_in_days = 1
 }
 
-output "messages_api_url" {
-  value = aws_apigatewayv2_api.messages_api.api_endpoint
-}
