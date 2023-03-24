@@ -1,5 +1,5 @@
 resource "aws_dynamodb_table" "messages_table" {
-  name         = "MessagesTable"
+  name         = var.table_name
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "pk"
   range_key    = "sk"
@@ -14,9 +14,7 @@ resource "aws_dynamodb_table" "messages_table" {
     type = "S"
   }
 
-  tags = {
-    Name = "MessagesTable"
-  }
+  tags = var.table_tags
 }
 
 resource "aws_iam_policy" "dynamoDBLambdaReadPolicy" {
