@@ -32,18 +32,7 @@ export class StaticSite extends Construct {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       versioned: true,
       accessControl: s3.BucketAccessControl.PRIVATE,
-
-      /**
-       * The default removal policy is RETAIN, which means that cdk destroy will not attempt to delete
-       * the new bucket, and it will remain in your account until manually deleted. By setting the policy to
-       * DESTROY, cdk destroy will attempt to delete the bucket, but will error if the bucket is not empty.
-       */
       removalPolicy: RemovalPolicy.DESTROY, // NOT recommended for production code
-
-      /**
-       * For sample purposes only, if you create an S3 bucket then populate it, stack destruction fails.  This
-       * setting will enable full cleanup of the demo.
-       */
       autoDeleteObjects: true, // NOT recommended for production code
     });
 
@@ -59,6 +48,7 @@ export class StaticSite extends Construct {
         ],
       })
     );
+    
     new CfnOutput(this, "Bucket", { value: siteBucket.bucketName });
 
     // CloudFront distribution
