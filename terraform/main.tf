@@ -10,12 +10,13 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-west-1"
+  region = var.region
 }
 
-module "static_website" {
+module "static_site" {
   source      = "./modules/static-site"
   bucket_name = "react-bucket-hosted-aws-s3-terraform"
+  region = var.region
   tags = {
     Terraform   = "true"
     Environment = "dev"
@@ -25,6 +26,7 @@ module "static_website" {
 module "serverless_backend" {
   source     = "./modules/serverless-backend"
   table_name = "MessagesTable"
+  region = var.region
   table_tags = {
     name = "MessagesTable"
   }
