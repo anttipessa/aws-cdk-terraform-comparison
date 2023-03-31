@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "static_react_bucket" {
-  bucket = var.bucket_name
-  tags = var.tags
+  bucket        = var.bucket_name
+  tags          = var.tags
   force_destroy = true
 }
 

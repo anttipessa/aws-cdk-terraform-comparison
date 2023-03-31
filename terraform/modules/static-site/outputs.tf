@@ -12,7 +12,7 @@ output "bucket_name" {
 
 output "bucket_id" {
   description = "Name (id) of the bucket"
-  value       = aws_s3_bucket.static_react_bucket.id 
+  value       = aws_s3_bucket.static_react_bucket.id
 }
 
 output "cf_name" {
