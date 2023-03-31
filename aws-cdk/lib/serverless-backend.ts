@@ -2,7 +2,6 @@ import { CfnOutput, RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
 import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
 import { Architecture } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Construct } from "constructs";
 import {
   CorsHttpMethod,
@@ -12,7 +11,6 @@ import {
 import { HttpLambdaIntegration } from "@aws-cdk/aws-apigatewayv2-integrations-alpha";
 
 export class ServerlessBackend extends Construct {
-
   constructor(parent: Stack, name: string) {
     super(parent, name);
 
@@ -27,13 +25,11 @@ export class ServerlessBackend extends Construct {
     const readFunction = new NodejsFunction(this, "ReadMsgsFn", {
       architecture: Architecture.ARM_64,
       entry: `./../lambda/readFunction.ts`,
-      logRetention: RetentionDays.ONE_WEEK,
     });
 
     const writeFunction = new NodejsFunction(this, "WriteMsgsFn", {
       architecture: Architecture.ARM_64,
       entry: `./../lambda/writeFunction.ts`,
-      logRetention: RetentionDays.ONE_WEEK,
     });
 
     table.grantReadData(readFunction);

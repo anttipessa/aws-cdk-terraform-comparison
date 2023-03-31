@@ -1,27 +1,27 @@
 
 data "archive_file" "lambda" {
   type        = "zip"
-  source_dir  = "../${path.root}/lambda/dist"
-  output_path = "../${path.root}/lambda/dist/lambda.zip"
+  source_dir  = "${path.module}/dist"
+  output_path = "${path.module}/dist/lambda.zip"
 }
 
 resource "aws_lambda_function" "read_function" {
-  filename      = data.archive_file.lambda.output_path
-  function_name = "readFunction"
-  role          = aws_iam_role.iam_for_lambda_read.arn
-  handler       = "readFunction.handler"
-  architectures = ["arm64"]
-  runtime       = "nodejs14.x"
+  filename         = data.archive_file.lambda.output_path
+  function_name    = "readFunction"
+  role             = aws_iam_role.iam_for_lambda_read.arn
+  handler          = "readFunction.handler"
+  architectures    = ["arm64"]
+  runtime          = "nodejs14.x"
   source_code_hash = data.archive_file.lambda.output_base64sha256
 }
 
 resource "aws_lambda_function" "write_function" {
-  filename      = data.archive_file.lambda.output_path
-  function_name = "writeFunction"
-  role          = aws_iam_role.iam_for_lambda_write.arn
-  handler       = "writeFunction.handler"
-  architectures = ["arm64"]
-  runtime       = "nodejs14.x"
+  filename         = data.archive_file.lambda.output_path
+  function_name    = "writeFunction"
+  role             = aws_iam_role.iam_for_lambda_write.arn
+  handler          = "writeFunction.handler"
+  architectures    = ["arm64"]
+  runtime          = "nodejs14.x"
   source_code_hash = data.archive_file.lambda.output_base64sha256
 }
 
