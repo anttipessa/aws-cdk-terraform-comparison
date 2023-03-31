@@ -4,12 +4,11 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 4.58.0"
     }
-    archive_file = {
+    archive = {
       source  = "hashicorp/archive"
-      version = "~> 2.2.0"
+      version = "~> 2.3.0"
     }
   }
-
   required_version = ">= 1.2.0"
 }
 
