@@ -65,4 +65,8 @@ resource "aws_dynamodb_table" "terraform-state" {
     name = "LockID"
     type = "S"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
