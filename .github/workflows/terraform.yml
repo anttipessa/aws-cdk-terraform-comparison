@@ -1,4 +1,4 @@
-name: "Terraform"
+name: Terraform
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Format
         id: fmt
@@ -56,7 +56,7 @@ jobs:
           github_token: ${{ secrets.github_token }}
           tflint_init: true
           reporter: github-pr-review
-          working_directory: "terraform"
+          working_directory: terraform
           filter_mode: "nofilter" # Optional. Check all files, not just the diff
 
       - name: Run Checkov
@@ -64,7 +64,8 @@ jobs:
         uses: bridgecrewio/checkov-action@master
         with:
           directory: terraform
-          platform: terraform
+          framework: terraform
+          compact: true
           soft_fail: true
           quiet: true
           output_format: cli,junitxml
@@ -75,37 +76,7 @@ jobs:
         with:
           report_paths: 'results.junitxml'
           detailed_summary: true
-          fail_on_failure: false
-
-      - name: Update Pull Request
-        uses: actions/github-script@v6
-        if: github.event_name == 'pull_request'
-        env:
-          PLAN: ${{ steps.plan.outputs.stdout }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-
-            <details><summary>Show Plan</summary>
-
-            \`\`\`terraform\n
-            ${process.env.PLAN}
-            \`\`\`
-
-            </details>
-
-            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+          check_name: Checkov Report Terraform
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'

@@ -1,0 +1,86 @@
+name: AWS-CDK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - aws-cdk/*
+  pull_request:
+
+jobs:
+  aws_cdk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aws-cdk
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Install CDK
+        run: npm install -g aws-cdk
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Build Lambda
+        run: npm run build-lambda
+        continue-on-error: true
+
+      - name: Build React
+        run: npm run build-react
+        continue-on-error: true
+
+      - name: Run Jest
+        run: npm run test
+        continue-on-error: true
+
+      - name: Publish Jest Report
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files:  |
+            **/report.xml
+          check_name: AWS-CDK Unit-Test Report
+
+      - name: CDK Diff
+        run: cdk diff
+
+      - name: CDK Synth
+        run: cdk synth
+
+      - name: CDK Doctor
+        run: cdk doctor
+
+      - name: Run Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: aws-cdk
+          soft_fail: true
+          quiet: true
+          output_format: cli,junitxml
+          output_file_path: console,results.junitxml
+          compact: true
+    
+      - name: Publish Checkov Report
+        uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: 'results.junitxml'
+          detailed_summary: true
+          check_name: Checkov Report AWS-CDK

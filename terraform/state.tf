@@ -3,21 +3,8 @@ terraform {
     bucket         = "aws-s3-terraform-state"
     key            = "state/terraform.tfstate"
     region         = "eu-west-1"
-    encrypt        = true
-    kms_key_id     = "alias/terraform-bucket-key"
     dynamodb_table = "terraform-state"
   }
-}
-
-resource "aws_kms_key" "terraform-bucket-key" {
-  description             = "This key is used to encrypt bucket objects"
-  deletion_window_in_days = 10
-  enable_key_rotation     = true
-}
-
-resource "aws_kms_alias" "key-alias" {
-  name          = "alias/terraform-bucket-key"
-  target_key_id = aws_kms_key.terraform-bucket-key.key_id
 }
 
 resource "aws_s3_bucket" "terraform-state" {
@@ -34,17 +21,6 @@ resource "aws_s3_bucket_versioning" "versioning_s3" {
 resource "aws_s3_bucket_acl" "acl_s3" {
   bucket = aws_s3_bucket.terraform-state.id
   acl    = "private"
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "ssec_s3" {
-  bucket = aws_s3_bucket.terraform-state.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.terraform-bucket-key.arn
-      sse_algorithm     = "aws:kms"
-    }
-  }
 }
 
 resource "aws_s3_bucket_public_access_block" "block" {
@@ -64,9 +40,5 @@ resource "aws_dynamodb_table" "terraform-state" {
   attribute {
     name = "LockID"
     type = "S"
-  }
-
-  lifecycle {
-    prevent_destroy = true
   }
 }
