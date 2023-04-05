@@ -6,10 +6,9 @@ import { CfnOutput, Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { CachePolicy } from "aws-cdk-lib/aws-cloudfront";
-import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
 
 /**
- * Static site infrastructure, which deploys site content to an S3 bucket.
+ * Static site infrastructure with S3 and CloudFront.
  *
  * The site redirects from HTTP to HTTPS, using a CloudFront distribution.
  */
@@ -48,7 +47,7 @@ export class StaticSite extends Construct {
         ],
       })
     );
-    
+
     new CfnOutput(this, "Bucket", { value: siteBucket.bucketName });
 
     // CloudFront distribution
@@ -90,13 +89,6 @@ export class StaticSite extends Construct {
 
     new CfnOutput(this, "DomainName", {
       value: distribution.distributionDomainName,
-    });
-
-    new BucketDeployment(this, "DeployWithInvalidation", {
-      sources: [Source.asset("../react-app/build")],
-      destinationBucket: siteBucket,
-      distribution,
-      distributionPaths: ["/*"],
     });
   }
 }

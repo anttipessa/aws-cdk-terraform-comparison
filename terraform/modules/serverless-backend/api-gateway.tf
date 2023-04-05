@@ -9,17 +9,15 @@ resource "aws_apigatewayv2_api" "messages_api" {
 }
 
 resource "aws_apigatewayv2_route" "messages_route" {
-  api_id        = aws_apigatewayv2_api.messages_api.id
-  route_key     = "GET /messages"
-  target        = "integrations/${aws_apigatewayv2_integration.messages_integration_get.id}"
-  authorizer_id = aws_apigatewayv2_api.messages_api.id
+  api_id    = aws_apigatewayv2_api.messages_api.id
+  route_key = "GET /messages"
+  target    = "integrations/${aws_apigatewayv2_integration.messages_integration_get.id}"
 }
 
 resource "aws_apigatewayv2_route" "messages_route_post" {
-  api_id        = aws_apigatewayv2_api.messages_api.id
-  route_key     = "POST /messages"
-  target        = "integrations/${aws_apigatewayv2_integration.messages_integration_post.id}"
-  authorizer_id = aws_apigatewayv2_api.messages_api.id
+  api_id    = aws_apigatewayv2_api.messages_api.id
+  route_key = "POST /messages"
+  target    = "integrations/${aws_apigatewayv2_integration.messages_integration_post.id}"
 }
 
 resource "aws_apigatewayv2_integration" "messages_integration_get" {
