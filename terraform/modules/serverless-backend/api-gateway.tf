@@ -49,7 +49,7 @@ resource "aws_apigatewayv2_stage" "messages_stage" {
   name   = "$default"
 
   access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.api_gateway_sample.arn
+    destination_arn = aws_cloudwatch_log_group.api_gateway_access_logs.arn
     format          = jsonencode({ "requestId" : "$context.requestId", "ip" : "$context.identity.sourceIp", "requestTime" : "$context.requestTime", "httpMethod" : "$context.httpMethod", "routeKey" : "$context.routeKey", "status" : "$context.status", "protocol" : "$context.protocol", "responseLength" : "$context.responseLength" })
   }
   auto_deploy = true
@@ -65,9 +65,3 @@ resource "aws_apigatewayv2_deployment" "messages_deployment" {
   aws_apigatewayv2_integration.messages_integration_post]
 
 }
-
-resource "aws_cloudwatch_log_group" "api_gateway_sample" {
-  name              = "/aws/apigateway/messagesApi"
-  retention_in_days = 1
-}
-
