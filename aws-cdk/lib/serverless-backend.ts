@@ -1,38 +1,36 @@
-import { CfnOutput, RemovalPolicy, Stack, StackProps } from "aws-cdk-lib";
-import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
-import { Architecture } from "aws-cdk-lib/aws-lambda";
+import { CfnOutput, RemovalPolicy, Stack } from "aws-cdk-lib";
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as lambda from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
-import {
-  CorsHttpMethod,
-  HttpApi,
-  HttpMethod,
-} from "@aws-cdk/aws-apigatewayv2-alpha";
+import * as apigw2 from "@aws-cdk/aws-apigatewayv2-alpha";
 import { HttpLambdaIntegration } from "@aws-cdk/aws-apigatewayv2-integrations-alpha";
 import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
-import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import * as iam from "aws-cdk-lib/aws-iam";
 import { CfnStage } from "aws-cdk-lib/aws-apigatewayv2";
 
 export class ServerlessBackend extends Construct {
   constructor(parent: Stack, name: string) {
     super(parent, name);
 
-    const table = new Table(this, "MessagesTable", {
-      billingMode: BillingMode.PAY_PER_REQUEST,
-      partitionKey: { name: "pk", type: AttributeType.STRING },
+    const table = new dynamodb.Table(this, "MessagesTable", {
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
       removalPolicy: RemovalPolicy.DESTROY,
-      sortKey: { name: "sk", type: AttributeType.STRING },
+      sortKey: { name: "sk", type: dynamodb.AttributeType.STRING },
       tableName: "MessagesTable",
     });
 
     const readFunction = new NodejsFunction(this, "ReadMsgsFn", {
-      architecture: Architecture.ARM_64,
+      runtime: lambda.Runtime.NODEJS_14_X,
+      architecture: lambda.Architecture.ARM_64,
       entry: `./../lambda/readFunction.ts`,
       logRetention: RetentionDays.ONE_DAY,
     });
 
     const writeFunction = new NodejsFunction(this, "WriteMsgsFn", {
-      architecture: Architecture.ARM_64,
+      runtime: lambda.Runtime.NODEJS_14_X,
+      architecture: lambda.Architecture.ARM_64,
       entry: `./../lambda/writeFunction.ts`,
       logRetention: RetentionDays.ONE_DAY,
     });
@@ -41,76 +39,70 @@ export class ServerlessBackend extends Construct {
 
     table.grantWriteData(writeFunction);
 
-    const api = new HttpApi(this, "MessagesApi", {
+    const api = new apigw2.HttpApi(this, "MessagesApi", {
       corsPreflight: {
         allowHeaders: ["Content-Type"],
-        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.POST],
+        allowMethods: [apigw2.CorsHttpMethod.GET, apigw2.CorsHttpMethod.POST],
         allowOrigins: ["*"],
       },
     });
 
-    const accessLogs = new LogGroup(this, 'APIGW-AccessLogs', {
-      logGroupName: 'APIGW-AccessLogs',
+    const accessLogs = new LogGroup(this, "APIGW-AccessLogs", {
       retention: RetentionDays.ONE_DAY,
-    })
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
 
-    const stage = api.defaultStage?.node.defaultChild as CfnStage
+    const stage = api.defaultStage?.node.defaultChild as CfnStage;
     stage.accessLogSettings = {
       destinationArn: accessLogs.logGroupArn,
       format: JSON.stringify({
-        requestId: '$context.requestId',
-        userAgent: '$context.identity.userAgent',
-        sourceIp: '$context.identity.sourceIp',
-        requestTime: '$context.requestTime',
-        requestTimeEpoch: '$context.requestTimeEpoch',
-        httpMethod: '$context.httpMethod',
-        path: '$context.path',
-        status: '$context.status',
-        protocol: '$context.protocol',
-        responseLength: '$context.responseLength',
-        domainName: '$context.domainName'
-      })
-    }
+        requestId: "$context.requestId",
+        userAgent: "$context.identity.userAgent",
+        sourceIp: "$context.identity.sourceIp",
+        requestTime: "$context.requestTime",
+        requestTimeEpoch: "$context.requestTimeEpoch",
+        httpMethod: "$context.httpMethod",
+        path: "$context.path",
+        status: "$context.status",
+        protocol: "$context.protocol",
+        responseLength: "$context.responseLength",
+        domainName: "$context.domainName",
+      }),
+    };
 
-    const role = new Role(this, 'ApiGWLogWriterRole', {
-      assumedBy: new ServicePrincipal('apigateway.amazonaws.com')
-    })
+    const role = new iam.Role(this, "ApiGWLogWriterRole", {
+      assumedBy: new iam.ServicePrincipal("apigateway.amazonaws.com"),
+    });
 
-    const policy = new PolicyStatement({
+    const policy = new iam.PolicyStatement({
       actions: [
-        'logs:CreateLogGroup',
-        'logs:CreateLogStream',
-        'logs:DescribeLogGroups',
-        'logs:DescribeLogStreams',
-        'logs:PutLogEvents',
-        'logs:GetLogEvents',
-        'logs:FilterLogEvents'
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents",
+        "logs:GetLogEvents",
+        "logs:FilterLogEvents",
       ],
-      resources: ['*']
-    })
+      resources: ["*"],
+    });
 
-    role.addToPolicy(policy)
-    accessLogs.grantWrite(role)
+    role.addToPolicy(policy);
+    accessLogs.grantWrite(role);
 
-    const readIntegration = new HttpLambdaIntegration(
-      "ReadIntegration",
-      readFunction
-    );
+    const readIntegration = new HttpLambdaIntegration("ReadIntegration", readFunction);
 
-    const writeIntegration = new HttpLambdaIntegration(
-      "WriteIntegration",
-      writeFunction
-    );
+    const writeIntegration = new HttpLambdaIntegration("WriteIntegration", writeFunction);
 
     api.addRoutes({
       integration: readIntegration,
-      methods: [HttpMethod.GET],
+      methods: [apigw2.HttpMethod.GET],
       path: "/messages",
     });
 
     api.addRoutes({
       integration: writeIntegration,
-      methods: [HttpMethod.POST],
+      methods: [apigw2.HttpMethod.POST],
       path: "/messages",
     });
 

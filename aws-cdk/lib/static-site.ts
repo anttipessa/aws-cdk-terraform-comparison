@@ -16,13 +16,9 @@ export class StaticSite extends Construct {
   constructor(parent: Stack, name: string) {
     super(parent, name);
 
-    const cloudfrontOAI = new cloudfront.OriginAccessIdentity(
-      this,
-      "cloudfront-OAI",
-      {
-        comment: `OAI for ${name}`,
-      }
-    );
+    const cloudfrontOAI = new cloudfront.OriginAccessIdentity(this, "cloudfront-OAI", {
+      comment: `OAI for ${name}`,
+    });
 
     // Content bucket
     const siteBucket = new s3.Bucket(this, "SiteBucket", {
@@ -42,13 +38,11 @@ export class StaticSite extends Construct {
         resources: [siteBucket.arnForObjects("*")],
         principals: [
           new iam.CanonicalUserPrincipal(
-            cloudfrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId
+            cloudfrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId,
           ),
         ],
-      })
+      }),
     );
-
-    new CfnOutput(this, "Bucket", { value: siteBucket.bucketName });
 
     // CloudFront distribution
     const distribution = new cloudfront.Distribution(this, "SiteDistribution", {
@@ -82,6 +76,8 @@ export class StaticSite extends Construct {
       },
       priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
     });
+
+    new CfnOutput(this, "Bucket", { value: siteBucket.bucketName });
 
     new CfnOutput(this, "DistributionId", {
       value: distribution.distributionId,
