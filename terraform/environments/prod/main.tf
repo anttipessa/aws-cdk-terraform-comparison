@@ -24,7 +24,7 @@ module "serverless_backend" {
   table_tags = {
     name = "MessagesTableProd"
   }
-  env = "prod"
+  env                = "prod"
   lambda_memory_size = 512
 }
 

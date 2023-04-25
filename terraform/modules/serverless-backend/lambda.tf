@@ -23,7 +23,7 @@ resource "aws_lambda_function" "write_function" {
   architectures    = ["arm64"]
   runtime          = "nodejs14.x"
   source_code_hash = data.archive_file.lambda.output_base64sha256
-  memory_size = var.lambda_memory_size
+  memory_size      = var.lambda_memory_size
 }
 
 resource "aws_lambda_permission" "allow_api_gateway_read" {
