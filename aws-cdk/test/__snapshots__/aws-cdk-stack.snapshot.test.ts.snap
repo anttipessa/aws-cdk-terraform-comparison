@@ -177,6 +177,7 @@ exports[`AWS CDK Stack matches the snapshot 1`] = `
     "ServerlessBackendAPIGWAccessLogsB7444931": {
       "DeletionPolicy": "Delete",
       "Properties": {
+        "LogGroupName": "undefined_APIGW-AccessLogs",
         "RetentionInDays": 1,
       },
       "Type": "AWS::Logs::LogGroup",
@@ -451,7 +452,6 @@ exports[`AWS CDK Stack matches the snapshot 1`] = `
             "KeyType": "RANGE",
           },
         ],
-        "TableName": "MessagesTable",
       },
       "Type": "AWS::DynamoDB::Table",
       "UpdateReplacePolicy": "Delete",
@@ -602,6 +602,7 @@ exports[`AWS CDK Stack matches the snapshot 1`] = `
           },
         },
         "Handler": "index.handler",
+        "MemorySize": 128,
         "Role": {
           "Fn::GetAtt": [
             "ServerlessBackendWriteMsgsFnServiceRole6FD9CAD9",
@@ -741,7 +742,6 @@ exports[`AWS CDK Stack matches the snapshot 1`] = `
       "DeletionPolicy": "Delete",
       "Properties": {
         "AccessControl": "Private",
-        "BucketName": "react-bucket-hosted-aws-s3-cdk",
         "PublicAccessBlockConfiguration": {
           "BlockPublicAcls": true,
           "BlockPublicPolicy": true,

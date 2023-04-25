@@ -45,6 +45,9 @@
     "@aws-cdk/aws-apigateway:authorizerChangeDeploymentLogicalId": true,
     "@aws-cdk/aws-ec2:launchTemplateDefaultUserData": true,
     "@aws-cdk/aws-secretsmanager:useAttachedSecretResourcePolicyForSecretTargetAttachments": true,
-    "@aws-cdk/aws-redshift:columnId": true
+    "@aws-cdk/aws-redshift:columnId": true,
+    "env": "dev",
+    "bucketname": "react-bucket-hosted-aws-s3-cdk",
+    "tablename": "MessagesTable"
   }
 }

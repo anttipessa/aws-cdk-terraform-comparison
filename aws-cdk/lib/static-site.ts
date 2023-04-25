@@ -7,13 +7,18 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
 import { CachePolicy } from "aws-cdk-lib/aws-cloudfront";
 
+export interface StaticSiteProps {
+  env: string;
+  bucketName: string;
+}
+
 /**
  * Static site infrastructure with S3 and CloudFront.
  *
  * The site redirects from HTTP to HTTPS, using a CloudFront distribution.
  */
 export class StaticSite extends Construct {
-  constructor(parent: Stack, name: string) {
+  constructor(parent: Stack, name: string, props: StaticSiteProps) {
     super(parent, name);
 
     const cloudfrontOAI = new cloudfront.OriginAccessIdentity(this, "cloudfront-OAI", {
@@ -22,7 +27,7 @@ export class StaticSite extends Construct {
 
     // Content bucket
     const siteBucket = new s3.Bucket(this, "SiteBucket", {
-      bucketName: "react-bucket-hosted-aws-s3-cdk",
+      bucketName: props.bucketName,
       publicReadAccess: false,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       versioned: true,
