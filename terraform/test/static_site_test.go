@@ -39,6 +39,7 @@ func TestStaticSite(t *testing.T) {
 				"Name":        "Terraform Test",
 			},
 			"region": awsRegion,
+			"env":    "test",
 		},
 	})
 

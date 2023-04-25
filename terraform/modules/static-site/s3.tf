@@ -5,8 +5,17 @@ resource "aws_s3_bucket" "static_react_bucket" {
 }
 
 resource "aws_s3_bucket_acl" "s3_acl" {
+  bucket     = aws_s3_bucket.static_react_bucket.id
+  acl        = "private"
+  depends_on = [aws_s3_bucket_ownership_controls.bucket_ownership]
+}
+
+resource "aws_s3_bucket_ownership_controls" "bucket_ownership" {
   bucket = aws_s3_bucket.static_react_bucket.id
-  acl    = "private"
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
 }
 
 resource "aws_s3_bucket_versioning" "versioning_s3" {
@@ -22,18 +31,6 @@ resource "aws_s3_bucket_public_access_block" "block_public_access" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
-}
-
-data "aws_iam_policy_document" "react_app_s3_policy" {
-  statement {
-    actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.static_react_bucket.arn}/*"]
-
-    principals {
-      type        = "AWS"
-      identifiers = [aws_cloudfront_origin_access_identity.oai.iam_arn]
-    }
-  }
 }
 
 resource "aws_s3_bucket_policy" "react_app_bucket_policy" {

@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_cloudfront_origin_access_identity" "oai" {
-  comment = "my-react-app OAI"
+  comment = "${var.env}-my-react-app OAI"
 }
 
 resource "aws_cloudfront_distribution" "cf_distribution" {
