@@ -4,7 +4,10 @@ import { StaticSite } from "../lib/static-site";
 
 describe("Static site", () => {
   const stack = new cdk.Stack();
-  new StaticSite(stack, "StaticSite");
+  new StaticSite(stack, "StaticSite", {
+    env: "test",
+    bucketName: "react-bucket-hosted-aws-s3-cdk",
+  });
   const template = Template.fromStack(stack);
 
   test("is created with correct amount of resources", () => {

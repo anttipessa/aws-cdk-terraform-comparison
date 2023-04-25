@@ -7,7 +7,7 @@ data "archive_file" "lambda" {
 
 resource "aws_lambda_function" "read_function" {
   filename         = data.archive_file.lambda.output_path
-  function_name    = "readFunction"
+  function_name    = "readFunction_${var.env}"
   role             = aws_iam_role.iam_for_lambda_read.arn
   handler          = "readFunction.handler"
   architectures    = ["arm64"]
@@ -17,12 +17,13 @@ resource "aws_lambda_function" "read_function" {
 
 resource "aws_lambda_function" "write_function" {
   filename         = data.archive_file.lambda.output_path
-  function_name    = "writeFunction"
+  function_name    = "writeFunction_${var.env}"
   role             = aws_iam_role.iam_for_lambda_write.arn
   handler          = "writeFunction.handler"
   architectures    = ["arm64"]
   runtime          = "nodejs14.x"
   source_code_hash = data.archive_file.lambda.output_base64sha256
+  memory_size      = var.lambda_memory_size
 }
 
 resource "aws_lambda_permission" "allow_api_gateway_read" {

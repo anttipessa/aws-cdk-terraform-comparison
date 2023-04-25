@@ -27,6 +27,7 @@ func TestServerlessBackend(t *testing.T) {
 		Vars: map[string]interface{}{
 			"region":     awsRegion,
 			"table_name": "MessagesTable",
+			"env":        "test",
 		},
 	})
 

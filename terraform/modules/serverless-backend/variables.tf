@@ -15,3 +15,14 @@ variable "region" {
   description = "The AWS region to deploy to"
   type        = string
 }
+
+variable "env" {
+  description = "environment name"
+  type        = string
+}
+
+variable "lambda_memory_size" {
+  description = "The amount of memory to allocate to the lambda function"
+  type        = number
+  default     = 128
+}

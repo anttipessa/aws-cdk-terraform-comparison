@@ -4,7 +4,10 @@ import { ServerlessBackend } from "../lib/serverless-backend";
 
 describe("Serverless backend", () => {
   const stack = new cdk.Stack();
-  new ServerlessBackend(stack, "ServerlessBackend");
+  new ServerlessBackend(stack, "ServerlessBackend", {
+    env: "prod",
+    tableName: "MessagesTable",
+  });
   const template = Template.fromStack(stack);
 
   test("is created with correct resources", () => {
@@ -21,6 +24,7 @@ describe("Serverless backend", () => {
     template.hasResourceProperties("AWS::Lambda::Function", {
       Handler: "index.handler",
       Runtime: "nodejs14.x",
+      MemorySize: 512,
     });
 
     template.hasResourceProperties("AWS::DynamoDB::Table", {

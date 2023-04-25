@@ -9,16 +9,23 @@ import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { CfnStage } from "aws-cdk-lib/aws-apigatewayv2";
 
+export interface ServerlessBackendProps {
+  env: string;
+  tableName: string;
+}
+
 export class ServerlessBackend extends Construct {
-  constructor(parent: Stack, name: string) {
+  constructor(parent: Stack, name: string, props: ServerlessBackendProps) {
     super(parent, name);
+
+    const isProd: boolean = props.env === "prod";
 
     const table = new dynamodb.Table(this, "MessagesTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
-      removalPolicy: RemovalPolicy.DESTROY,
       sortKey: { name: "sk", type: dynamodb.AttributeType.STRING },
-      tableName: "MessagesTable",
+      tableName: props.tableName,
+      removalPolicy: RemovalPolicy.DESTROY,
     });
 
     const readFunction = new NodejsFunction(this, "ReadMsgsFn", {
@@ -30,6 +37,7 @@ export class ServerlessBackend extends Construct {
 
     const writeFunction = new NodejsFunction(this, "WriteMsgsFn", {
       runtime: lambda.Runtime.NODEJS_14_X,
+      memorySize: isProd ? 512 : 128,
       architecture: lambda.Architecture.ARM_64,
       entry: `./../lambda/writeFunction.ts`,
       logRetention: RetentionDays.ONE_DAY,
@@ -48,6 +56,7 @@ export class ServerlessBackend extends Construct {
     });
 
     const accessLogs = new LogGroup(this, "APIGW-AccessLogs", {
+      logGroupName: `${props.env}_APIGW-AccessLogs`,
       retention: RetentionDays.ONE_DAY,
       removalPolicy: RemovalPolicy.DESTROY,
     });

@@ -12,12 +12,12 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "iam_for_lambda_read" {
-  name               = "iam_for_lambda_read"
+  name               = "iam_for_lambda_read_${var.env}"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
 resource "aws_iam_role" "iam_for_lambda_write" {
-  name               = "iam_for_lambda_write"
+  name               = "iam_for_lambda_write_${var.env}"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
@@ -42,7 +42,7 @@ resource "aws_iam_role_policy_attachment" "logging_write_lambda_policy_attachmen
 }
 
 resource "aws_iam_policy" "function_logging_policy" {
-  name = "function-logging-policy"
+  name = "function_logging_policy_${var.env}"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -59,7 +59,7 @@ resource "aws_iam_policy" "function_logging_policy" {
 }
 
 resource "aws_iam_policy" "read_dynamodb_policy" {
-  name = "read_dynamodb_policy"
+  name = "read_dynamodb_policy_${var.env}"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -78,7 +78,7 @@ resource "aws_iam_policy" "read_dynamodb_policy" {
 }
 
 resource "aws_iam_policy" "write_dynamodb_policy" {
-  name = "write_dynamodb_policy"
+  name = "write_dynamodb_policy_${var.env}"
 
   policy = jsonencode({
     Version = "2012-10-17"

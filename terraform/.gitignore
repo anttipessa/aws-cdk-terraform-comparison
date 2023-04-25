@@ -36,3 +36,5 @@ terraform.rc
 node_modules
 dist
 src
+
+test_output*
